@@ -422,21 +422,38 @@ public static class DriverClient
         using SafeFileHandle? handle = OpenDevice();
         if (handle == null)
         {
+            Console.WriteLine("[TRACE GetVersion] OpenDevice() returned null - handshake stops before DeviceIoControl."); // TEMPORARY INSTRUMENTATION
             return null;
         }
 
-        byte[] outBuffer = new byte[Marshal.SizeOf<NETSPLIT_VERSION_INFO>()];
-        if (!DeviceIoControl(handle, IOCTL_GET_VERSION, null, 0, outBuffer, (uint)outBuffer.Length, out uint bytesReturned, IntPtr.Zero)
-            || bytesReturned < outBuffer.Length)
+        int expectedLength = Marshal.SizeOf<NETSPLIT_VERSION_INFO>();
+        byte[] outBuffer = new byte[expectedLength];
+
+        bool ok = DeviceIoControl(handle, IOCTL_GET_VERSION, null, 0, outBuffer, (uint)outBuffer.Length, out uint bytesReturned, IntPtr.Zero);
+        int lastError = Marshal.GetLastWin32Error(); // captured immediately after DeviceIoControl, before any other call
+
+        // TEMPORARY INSTRUMENTATION - remove after handshake diagnosis
+        Console.WriteLine(
+            $"[TRACE GetVersion] DeviceIoControl(IOCTL_GET_VERSION)=0x{IOCTL_GET_VERSION:X8} ok={ok} lastError={lastError} bytesReturned={bytesReturned} expectedLength={expectedLength}");
+
+        if (!ok || bytesReturned < outBuffer.Length)
         {
+            Console.WriteLine("[TRACE GetVersion] Returning null: ok=false or bytesReturned < expectedLength."); // TEMPORARY INSTRUMENTATION
             return null;
         }
 
         NETSPLIT_VERSION_INFO info = BytesToStruct<NETSPLIT_VERSION_INFO>(outBuffer);
-        return new DriverVersionInfo(
+        Console.WriteLine($"[TRACE GetVersion] Raw struct decoded: ProtocolVersion={info.ProtocolVersion} Capabilities=0x{info.Capabilities:X8}"); // TEMPORARY INSTRUMENTATION
+
+        var result = new DriverVersionInfo(
             (int)info.ProtocolVersion,
             (info.Capabilities & CAPABILITY_IPV4_REDIRECT) != 0,
             (info.Capabilities & CAPABILITY_IPV6_REDIRECT) != 0);
+
+        // TEMPORARY INSTRUMENTATION - remove after handshake diagnosis
+        Console.WriteLine(
+            $"[TRACE GetVersion] Returning DriverVersionInfo: ProtocolVersion={result.ProtocolVersion} IsCompatible={result.IsCompatible} (expects {DriverProtocol.Version})");
+        return result;
     }
 
     /// <summary>Queries live driver counters for diagnostics. Returns null if the driver isn't loaded/reachable.</summary>

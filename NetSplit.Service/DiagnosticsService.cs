@@ -60,6 +60,18 @@ public sealed class DiagnosticsService
     /// </summary>
     public DiagnosticsSnapshotDto GetDiagnostics(int connectedUiClients)
     {
+        // TEMPORARY INSTRUMENTATION - remove after handshake diagnosis.
+        // _driverHost.IsLoaded/State/StateDetail/LastKnownVersion are set only
+        // by DriverHostService.SetState (see that file for the actual decision);
+        // this just prints the values this method is about to package into
+        // DriverConnected/DriverProtocolCompatible so the "why" is visible
+        // right at the point those DTO fields are produced.
+        Console.WriteLine(
+            $"[TRACE DiagnosticsService] DriverConnected(IsLoaded)={_driverHost.IsLoaded} " +
+            $"DriverAvailabilityState={_driverHost.State} StateDetail=\"{_driverHost.StateDetail}\" " +
+            $"LastKnownVersion={(_driverHost.LastKnownVersion == null ? "null" : $"ProtocolVersion={_driverHost.LastKnownVersion.ProtocolVersion} IsCompatible={_driverHost.LastKnownVersion.IsCompatible}")} " +
+            $"=> DriverProtocolCompatible={_driverHost.LastKnownVersion?.IsCompatible ?? false}");
+
         DriverDiagnostics? diag = _driverHost.IsLoaded ? DriverClient.GetDiagnostics() : null;
 
         // Queried unconditionally, regardless of IsLoaded - this is the

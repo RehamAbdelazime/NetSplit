@@ -271,8 +271,16 @@ NetSplitDeviceControl(
 
         case IOCTL_NETSPLIT_GET_VERSION:
         {
+            // TEMPORARY INSTRUMENTATION - remove after handshake diagnosis
+            DbgPrintEx(DPFLTR_IHVNETWORK_ID, DPFLTR_INFO_LEVEL,
+                "NetSplit[TRACE]: IOCTL_NETSPLIT_GET_VERSION received. ioctl=0x%08X outLen=%lu sizeof(NETSPLIT_VERSION_INFO)=%Iu\n",
+                ioctl, outLen, sizeof(NETSPLIT_VERSION_INFO));
+
             if (outLen < sizeof(NETSPLIT_VERSION_INFO))
             {
+                DbgPrintEx(DPFLTR_IHVNETWORK_ID, DPFLTR_ERROR_LEVEL,
+                    "NetSplit[TRACE]: outLen %lu < sizeof(NETSPLIT_VERSION_INFO) %Iu -> STATUS_BUFFER_TOO_SMALL\n",
+                    outLen, sizeof(NETSPLIT_VERSION_INFO));
                 status = STATUS_BUFFER_TOO_SMALL;
                 break;
             }
@@ -282,6 +290,17 @@ NetSplitDeviceControl(
             response->Capabilities = NETSPLIT_CAPABILITY_IPV4_REDIRECT;
             information = sizeof(NETSPLIT_VERSION_INFO);
             status = STATUS_SUCCESS;
+
+            // TEMPORARY INSTRUMENTATION - remove after handshake diagnosis.
+            // Build marker repeated here (DPFLTR_ERROR_LEVEL, always visible)
+            // so this specific response is directly, unmistakably tied to a
+            // build - not just "some driver logged a banner at load time".
+            DbgPrintEx(DPFLTR_IHVNETWORK_ID, DPFLTR_ERROR_LEVEL,
+                "NetSplit[TRACE]: === BUILD MARKER === this GET_VERSION response was produced by build compiled %s %s\n",
+                __DATE__, __TIME__);
+            DbgPrintEx(DPFLTR_IHVNETWORK_ID, DPFLTR_INFO_LEVEL,
+                "NetSplit[TRACE]: IOCTL_NETSPLIT_GET_VERSION responding. ProtocolVersion=%lu Capabilities=0x%08X sizeof(NETSPLIT_VERSION_INFO)=%Iu\n",
+                response->ProtocolVersion, response->Capabilities, sizeof(NETSPLIT_VERSION_INFO));
             break;
         }
 
@@ -344,6 +363,11 @@ NetSplitDeviceControl(
         InterlockedIncrement64(&g_IoctlFailureCount);
     }
 
+    // TEMPORARY INSTRUMENTATION - remove after handshake diagnosis
+    DbgPrintEx(DPFLTR_IHVNETWORK_ID, DPFLTR_INFO_LEVEL,
+        "NetSplit[TRACE]: completing ioctl=0x%08X Status=0x%08X Information=%Iu\n",
+        ioctl, status, information);
+
     Irp->IoStatus.Status = status;
     Irp->IoStatus.Information = information;
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
@@ -404,6 +428,18 @@ DriverEntry(
 )
 {
     UNREFERENCED_PARAMETER(RegistryPath);
+
+    // TEMPORARY INSTRUMENTATION - remove after handshake diagnosis.
+    // __DATE__/__TIME__ are preprocessor macros expanded by the compiler at
+    // compile time into string literals baked into this exact binary - they
+    // are NOT read at runtime, so this line is unmistakable, positive proof
+    // of which build is executing DriverEntry right now. Printed at
+    // DPFLTR_ERROR_LEVEL (not INFO) specifically so it is visible in
+    // DebugView even without "Enable Verbose Kernel Output" turned on -
+    // this one line alone should never be silently filtered.
+    DbgPrintEx(DPFLTR_IHVNETWORK_ID, DPFLTR_ERROR_LEVEL,
+        "NetSplit[TRACE]: === BUILD MARKER === compiled %s %s - if you do not see this exact string in DebugView, the loaded driver is NOT this build.\n",
+        __DATE__, __TIME__);
 
     DriverObject->DriverUnload = DriverUnload;
 

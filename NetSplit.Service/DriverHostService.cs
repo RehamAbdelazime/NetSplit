@@ -35,9 +35,11 @@ public sealed class DriverHostService : IDriverHost
     public Task RefreshAsync(CancellationToken cancellationToken)
     {
         DriverServiceStateInfo scmState = DriverClient.GetDriverServiceState();
+        Console.WriteLine($"[TRACE DriverHostService] SCM GetDriverServiceState() = {scmState.State}, detail=\"{scmState.Detail}\""); // TEMPORARY INSTRUMENTATION
 
         if (scmState.State != DriverServiceState.Running)
         {
+            Console.WriteLine("[TRACE DriverHostService] SCM state != Running -> SetState(loaded:false), GetVersion() is NOT called. THIS IS WHY DriverConnected=false."); // TEMPORARY INSTRUMENTATION
             SetState(ToAvailability(scmState.State), scmState.Detail, loaded: false, version: null);
             return Task.CompletedTask;
         }
@@ -46,8 +48,12 @@ public sealed class DriverHostService : IDriverHost
         // it does not prove the control device is open and answering, so
         // this is verified independently rather than trusted.
         DriverVersionInfo? version = DriverClient.GetVersion();
+        Console.WriteLine( // TEMPORARY INSTRUMENTATION
+            $"[TRACE DriverHostService] DriverClient.GetVersion() = {(version == null ? "null" : $"ProtocolVersion={version.ProtocolVersion} IsCompatible={version.IsCompatible}")}");
+
         if (version == null)
         {
+            Console.WriteLine("[TRACE DriverHostService] GetVersion() returned null -> DriverAvailabilityState.DeviceUnavailable, IsLoaded=false. THIS IS WHY DriverConnected=false."); // TEMPORARY INSTRUMENTATION
             SetState(
                 DriverAvailabilityState.DeviceUnavailable,
                 "SCM reports the driver service is Running, but its control device '\\\\.\\NetSplit' could not be opened (see DeviceOpenDiagnostics for the exact Win32 error). The service process may still be initializing, or WFP/device registration failed.",
@@ -58,6 +64,7 @@ public sealed class DriverHostService : IDriverHost
 
         if (!version.IsCompatible)
         {
+            Console.WriteLine($"[TRACE DriverHostService] version.IsCompatible=false (driver reports {version.ProtocolVersion}, expected {DriverProtocol.Version}) -> IsLoaded=false. THIS IS WHY DriverConnected=false."); // TEMPORARY INSTRUMENTATION
             SetState(
                 DriverAvailabilityState.Running,
                 $"Driver running and reachable, but protocol version {version.ProtocolVersion} is incompatible with this Service build (expects {DriverProtocol.Version}). Runtime rule synchronization is disabled until versions match.",

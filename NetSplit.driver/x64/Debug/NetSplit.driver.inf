@@ -7,7 +7,7 @@ Signature="$WINDOWS NT$"
 Class=System
 ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
 Provider=%ManufacturerName%
-DriverVer = 07/10/2026,0.32.5.607
+DriverVer = 07/11/2026,1.17.41.908
 CatalogFile=NetSplit.driver.cat
 PnpLockdown=1
 
