@@ -1,0 +1,53 @@
+;
+; NetSplit.driver.proof.inf
+;
+; ISOLATED PROOF DRIVER - installs as a separate service ("NetSplitProof"),
+; never the production "NetSplit" service. Safe to install/uninstall
+; independently of NetSplit.driver.
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider=%ManufacturerName%
+DriverVer = 07/10/2026,1.56.49.373
+CatalogFile=NetSplit.driver.proof.cat
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 13
+NetSplit.driver.proof.CopyFiles = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+NetSplit.driver.proof.sys = 1,,
+
+[DefaultInstall.NTamd64]
+CopyFiles = NetSplit.driver.proof.CopyFiles
+
+[DefaultInstall.NTamd64.Services]
+AddService = NetSplitProof,,NetSplit.driver.proof.Service
+
+[DefaultUninstall.NTamd64]
+LegacyUninstall = 1
+
+[NetSplit.driver.proof.CopyFiles]
+NetSplit.driver.proof.sys,,,0x00000040
+
+[NetSplit.driver.proof.Service]
+DisplayName    = %ServiceName%
+Description    = %ServiceDesc%
+ServiceType    = 1 ; SERVICE_KERNEL_DRIVER
+StartType      = 3 ; SERVICE_DEMAND_START (loaded via sc.exe)
+ErrorControl   = 1 ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %13%\NetSplit.driver.proof.sys
+
+[Strings]
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName="NetSplit.driver.proof Source Disk"
+ServiceName="NetSplitProof"
+ServiceDesc="NetSplit isolated bind-redirect proof driver - NOT for production use"
+
