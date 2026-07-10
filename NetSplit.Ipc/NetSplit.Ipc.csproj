@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>NetSplit.Ipc</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Microsoft's own first-party package - NamedPipeServerStreamAcl (the
+         documented way to set a pipe's security descriptor at creation
+         time, needed to restrict the pipe to Administrators + the
+         interactive user) lives here on .NET Core/5+, not in the base
+         System.IO.Pipes assembly. -->
+    <PackageReference Include="System.IO.Pipes.AccessControl" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NetSplit.Core\NetSplit.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+<Window x:Class="NetSplit.App.ValidationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="NetSplit End-to-End Validation (developer)" Height="480" Width="640"
+        FontFamily="Consolas" FontSize="14">
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Pipeline stage validation - each stage checks the previous one actually happened, not just that this one looks fine in isolation."
+                   TextWrapping="Wrap" FontWeight="Bold" Margin="0,0,0,10"/>
+
+        <ItemsControl x:Name="StageList" Grid.Row="1"/>
+
+        <TextBlock x:Name="FooterText" Grid.Row="2" Foreground="Gray" Margin="0,10,0,0"/>
+    </Grid>
+</Window>

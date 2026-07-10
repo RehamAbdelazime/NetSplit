@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>NetSplit.Driver.Interop</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NetSplit.Core\NetSplit.Core.csproj" />
+    <ProjectReference Include="..\NetSplit.Runtime\NetSplit.Runtime.csproj" />
+    <ProjectReference Include="..\NetSplit.Network\NetSplit.Network.csproj" />
+  </ItemGroup>
+
+</Project>

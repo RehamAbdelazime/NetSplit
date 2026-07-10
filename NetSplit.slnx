@@ -1,0 +1,22 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="NetSplit.driver/NetSplit.driver.vcxproj">
+    <Deploy />
+  </Project>
+  <Project Path="NetSplit.ui/NetSplit.ui.csproj" />
+  <Project Path="NetSplit.Network/NetSplit.Network.csproj" />
+  <Project Path="NetSplit.Network.Demo/NetSplit.Network.Demo.csproj" />
+  <Project Path="NetSplit.Core/NetSplit.Core.csproj" />
+  <Project Path="NetSplit.Core.Tests/NetSplit.Core.Tests.csproj" />
+  <Project Path="NetSplit.App/NetSplit.App.csproj" />
+  <Project Path="NetSplit.Driver.Interop/NetSplit.Driver.Interop.csproj" />
+  <Project Path="NetSplit.Console/NetSplit.Console.csproj" />
+  <Project Path="NetSplit.Runtime/NetSplit.Runtime.csproj" />
+  <Project Path="NetSplit.Runtime.Demo/NetSplit.Runtime.Demo.csproj" />
+  <Project Path="NetSplit.Runtime.Tests/NetSplit.Runtime.Tests.csproj" />
+  <Project Path="NetSplit.Ipc/NetSplit.Ipc.csproj" />
+  <Project Path="NetSplit.Service/NetSplit.Service.csproj" />
+</Solution>
